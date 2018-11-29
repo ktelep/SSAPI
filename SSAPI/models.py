@@ -1,5 +1,6 @@
 from SSAPI import db
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True)
@@ -36,7 +37,8 @@ class User(db.Model):
         return "admin" in self.roles
 
     def as_dict(self):
-        return {c.name: getattr(self,c.name) for c in self.__table__.columns if c.name not in "password"}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name not in "password"}
+
 
 class ScrimmageInvite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,7 +49,7 @@ class ScrimmageInvite(db.Model):
     scrimmage_id = db.Column(db.Integer, db.ForeignKey("scrimmage.id"))
 
     def as_dict(self):
-        return_dict = {c.name: getattr(self,c.name) for c in self.__table__.columns}
+        return_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         # Note we don't need to follow the relationships here, as the foreign
         # keys will provide with the ID of the related object
 
@@ -55,36 +57,48 @@ class ScrimmageInvite(db.Model):
 
 # Many-to-Many reference tables for Scrimmage class
 presenters = db.Table('presenters',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('scrimmage_id', db.Integer, db.ForeignKey('scrimmage.id'), primary_key=True)
-    )
+                      db.Column('user_id', db.Integer,
+                                db.ForeignKey('user.id'),
+                                primary_key=True),
+                      db.Column('scrimmage_id', db.Integer,
+                                db.ForeignKey('scrimmage.id'),
+                                primary_key=True)
+                      )
 
 advisors = db.Table('advisors',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('scrimmage_id', db.Integer, db.ForeignKey('scrimmage.id'), primary_key=True)
-    )
+                    db.Column('user_id', db.Integer,
+                              db.ForeignKey('user.id'), primary_key=True),
+                    db.Column('scrimmage_id', db.Integer,
+                              db.ForeignKey('scrimmage.id'), primary_key=True)
+                    )
+
 
 class Scrimmage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.Text)
     schedule = db.Column(db.Text)
     scrimmage_type = db.Column(db.Text)
-    scrimmage_complete = db.Column(db.Boolean) 
+    scrimmage_complete = db.Column(db.Boolean)
     max_advisors = db.Column(db.Integer)
-    presenters = db.relationship('User', secondary = presenters, backref=db.backref('scrimmages_presenter', lazy=True))
-    advisors = db.relationship('User', secondary = advisors, backref=db.backref('scrimmages_advisor', lazy=True))
+    presenters = db.relationship('User', secondary=presenters,
+                                 backref=db.backref('scrimmages_presenter',
+                                                    lazy=True))
+    advisors = db.relationship('User', secondary=advisors,
+                               backref=db.backref('scrimmages_advisor',
+                                                  lazy=True))
     invites = db.relationship('ScrimmageInvite', backref="scrimmage")
 
     def as_dict(self):
-        return_dict = {c.name: getattr(self,c.name) for c in self.__table__.columns}
+        return_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         # Follow the M2M relationships to return presenter and advisor IDs
         return_dict["presenters"] = []
         return_dict["advisors"] = []
+        return_dict["invites"] = []
         for p in self.presenters:
             return_dict["presenters"].append(p.id)
         for a in self.advisors:
             return_dict["advisors"].append(a.id)
+        for i in self.invites:
+            return_dict["invites"].append(i.id)
 
         return return_dict
-
-
