@@ -26,25 +26,25 @@ class ScrimmageList(Resource):
                 query = Scrimmage.query
             else:
                 query = Scrimmage.query.filter(
-                     (Scrimmage.advisors.any(User.id == current_id)) |
-                     (Scrimmage.presenters.any(User.id == current_id)))
+                    (Scrimmage.advisors.any(User.id == current_id)) |
+                    (Scrimmage.presenters.any(User.id == current_id)))
         else:
             query = Scrimmage.query.filter(
-                 (Scrimmage.advisors.any(User.id == current_id)) |
-                 (Scrimmage.presenters.any(User.id == current_id)))
+                (Scrimmage.advisors.any(User.id == current_id)) |
+                (Scrimmage.presenters.any(User.id == current_id)))
 
         if args["role"]:
             if "advisor" in args["role"]:
                 query = query.filter(
-                              Scrimmage.advisors.any(User.id == current_id))
+                    Scrimmage.advisors.any(User.id == current_id))
 
             if "presenter" in args["role"]:
                 query = query.filter(Scrimmage.presenters.any(
-                                                      User.id == current_id))
+                    User.id == current_id))
 
         if args["completed"] is not None:
             query = query.filter(
-                           Scrimmage.scrimmage_complete == args["completed"])
+                Scrimmage.scrimmage_complete == args["completed"])
 
         ret = []
         result = query.all()
