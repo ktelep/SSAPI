@@ -15,9 +15,12 @@ class Login(Resource):
        username = req.get('username', None)
        password = req.get('password', None)
 
-       user = guard.authenticate(username, password)
-       ret = {'access_token': guard.encode_jwt_token(user)}
-       return jsonify(ret)
+       try:
+           user = guard.authenticate(username, password)
+           ret = {'access_token': guard.encode_jwt_token(user)}
+           return jsonify(ret)
+       except Exception as e:
+           return e.jsonify()
 
 @api.route('/Users')
 class UsersList(Resource):

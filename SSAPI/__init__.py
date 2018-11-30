@@ -2,12 +2,14 @@ from flask import Flask, request, jsonify
 from SSAPI.config import Config
 from flask_restplus import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import flask_praetorian
 
 guard = flask_praetorian.Praetorian()
 
 app = Flask(__name__)                  # Create a Flask WSGI application
 app.config.from_object(Config)         # Pull in our configuration
+CORS(app)                              # Allow Cross-Origin
 api = Api(app)                         # Create a Flask-RESTPlus API
 db = SQLAlchemy(app)                   # Create our SQLAlchemy DB
 
